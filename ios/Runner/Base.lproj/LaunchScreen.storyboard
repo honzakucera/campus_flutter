@@ -53,7 +53,7 @@
     <resources>
         <image name="LaunchImage" width="2048" height="1079"/>
         <namedColor name="tumBlue">
-            <color red="0.0" green="0.39599999785423279" blue="0.74099999666213989" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.6298499971628189" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

@@ -51,6 +51,7 @@ class NavigaTumRoomScaffold extends ConsumerWidget {
         details.name,
         LatLng(details.coordinates.latitude!, details.coordinates.longitude!),
         context,
+        navigaTumId: details.id,
       ),
       icon: Icon(Icons.directions, color: context.theme.primaryColor),
     );

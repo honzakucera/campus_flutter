@@ -6,12 +6,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:map_launcher/map_launcher.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<void> showDirectionsDialog(
   String name,
   LatLng location,
-  BuildContext context,
-) async {
+  BuildContext context, {
+  String? navigaTumId,
+}) async {
   MapLauncher.installedMaps.then((value) {
     if (context.mounted) {
       showModalBottomSheet(
@@ -31,26 +33,42 @@ Future<void> showDirectionsDialog(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) => ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: SvgPicture.asset(
-                        value[index].icon,
-                        height: 30,
-                        width: 30,
+                  itemBuilder: (context, index) {
+                    if (index == value.length) {
+                      return ListTile(
+                        leading: const Icon(Icons.map_outlined, size: 30),
+                        title: Text(context.tr("openIn", args: ["NavigaTUM"])),
+                        onTap: () => launchUrl(
+                          Uri(
+                            scheme: 'https',
+                            host: 'nav.tum.de',
+                            pathSegments: ['room', navigaTumId!],
+                          ),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                      );
+                    }
+                    return ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: SvgPicture.asset(
+                          value[index].icon,
+                          height: 30,
+                          width: 30,
+                        ),
                       ),
-                    ),
-                    title: Text(
-                      context.tr("openIn", args: [value[index].mapName]),
-                    ),
-                    onTap: () => MapLauncher.showMarker(
-                      mapType: value[index].mapType,
-                      title: name,
-                      coords: Coords(location.latitude, location.longitude),
-                    ),
-                  ),
+                      title: Text(
+                        context.tr("openIn", args: [value[index].mapName]),
+                      ),
+                      onTap: () => MapLauncher.showMarker(
+                        mapType: value[index].mapType,
+                        title: name,
+                        coords: Coords(location.latitude, location.longitude),
+                      ),
+                    );
+                  },
                   separatorBuilder: (context, index) => const PaddedDivider(),
-                  itemCount: value.length,
+                  itemCount: value.length + (navigaTumId == null ? 0 : 1),
                 ),
               ),
               Padding(

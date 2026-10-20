@@ -1,6 +1,4 @@
-import 'package:campus_flutter/base/networking/apis/tumOnlineApi/tum_online_api.dart';
-import 'package:campus_flutter/base/networking/apis/tumOnlineApi/tum_online_api_exception.dart';
-import 'package:campus_flutter/base/networking/apis/tumOnlineApi/tum_online_api_endpoint.dart';
+import 'package:campus_flutter/base/networking/apis/tumOnlineApi/tum_online_course_api.dart';
 import 'package:campus_flutter/base/networking/base/rest_client.dart';
 import 'package:campus_flutter/main.dart';
 import 'package:campus_flutter/studiesComponent/model/lecture_details.dart';
@@ -11,18 +9,12 @@ class LectureDetailsService {
     bool forcedRefresh,
   ) async {
     RestClient restClient = getIt<RestClient>();
-    final response = await restClient
-        .getWithException<
-          LectureDetailsElement,
-          TumOnlineApi,
-          TumOnlineApiException
-        >(
-          TumOnlineApi(TumOnlineEndpointLectureDetails(lvNr: lvNumber)),
-          LectureDetailsElement.fromJson,
-          TumOnlineApiException.fromJson,
-          forcedRefresh,
-        );
+    final response = await restClient.get<LectureDetails, TumOnlineCourseApi>(
+      TumOnlineCourseApi(lvNumber),
+      LectureDetails.fromCourseJson,
+      forcedRefresh,
+    );
 
-    return (response.saved, response.data.lectureDetails);
+    return (response.saved, response.data);
   }
 }

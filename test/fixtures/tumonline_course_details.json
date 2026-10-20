@@ -1,0 +1,63 @@
+{
+  "link": [],
+  "resource": [
+    {"content": {"type": "unrelated-resource"}},
+    {
+      "content": {
+        "type": "model-slc.tm.cp.student.CpCourseDetailDto",
+        "cpCourseDetailDto": {
+          "cpCourseDto": {
+            "id": 950000001,
+            "courseNumber": {"courseNumber": "IN0001"},
+            "courseTitle": {"value": "Algorithms &amp; Data Structures"},
+            "semesterDto": {
+              "key": "26W",
+              "semesterType": "W",
+              "semesterDesignation": {"value": "Wintersemester 2026/27"},
+              "startOfAcademicSemester": {"value": "2026-10-01"}
+            },
+            "organisationResponsibleDto": {
+              "id": 123,
+              "identificationName": "CIT",
+              "name": {"value": "School of Computation"}
+            },
+            "courseTypeDto": {
+              "key": "VO",
+              "courseTypeName": {"value": "Vorlesung"}
+            },
+            "courseNormConfigs": [
+              {"key": "ECTS", "value": "6"},
+              {"key": "SST", "value": "4"}
+            ],
+            "lectureships": [
+              {
+                "identityLibDto": {"firstName": "Alex", "lastName": "Tutor"},
+                "teachingFunction": {"key": "V"}
+              },
+              {
+                "identityLibDto": {"firstName": "Sam", "lastName": "Lecturer"},
+                "teachingFunction": {"key": "L"}
+              },
+              {
+                "identityLibDto": {"firstName": "Sam", "lastName": "Lecturer"},
+                "teachingFunction": {"key": "V"}
+              }
+            ]
+          },
+          "cpCourseDescriptionDto": {
+            "courseContent": {"value": "Trees<br/>Graphs\nSorting"},
+            "previousKnowledge": {"value": "Programming"},
+            "courseObjective": {"value": "Design efficient algorithms"},
+            "teachingMethod": {"value": "Lectures and exercises"},
+            "assessmentScheme": {"value": "Written exam"},
+            "courseRegistrationInfo": {"value": "Register online"},
+            "additionalInformation": {
+              "recommendedLiterature": {"value": "Algorithms textbook"},
+              "comments": {"value": "Bring a laptop"}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -59,6 +59,24 @@ Please refer to the respective installation instructions:
 |------------------------------------------|------------------------------------------|----------------------------------------------|
 | `Flutter` (includes the `Dart` compiler) | SDK to develop this app                  | https://docs.flutter.dev/get-started/install |
 
+### Android emulator with devenv
+
+For the existing `campus_api36` AVD, run:
+
+```bash
+devenv shell
+campus-emulator
+```
+
+The launcher uses host OpenGL and cold boots, with Vulkan and snapshots disabled.
+Installed apps and sign-in data are preserved. On Ubuntu with NVIDIA, it exposes
+the host graphics driver and its XCB dependencies to the Nix emulator without
+mixing in the host's libc. This avoids SwiftShader's missing map labels and
+symbol artifacts. Other systems use their normal host driver configuration.
+
+Use `CAMPUS_AVD=another_avd campus-emulator` to select another existing AVD.
+Additional emulator arguments can be passed to `campus-emulator`.
+
 ### Updating the `.proto` files
 
 To update the generated stubs for the Campus, you need protoc installed, then activte it in dart and then you can generate the new client

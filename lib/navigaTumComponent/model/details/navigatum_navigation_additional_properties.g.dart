@@ -15,8 +15,16 @@ _$NavigaTumNavigationAdditionalPropertiesFromJson(Map<String, dynamic> json) =>
                 NavigaTumNavigationProperty.fromJson(e as Map<String, dynamic>),
           )
           .toList(),
+      floors:
+          (json['floors'] as List<dynamic>?)
+              ?.map((e) => NavigaTumFloor.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
 
 Map<String, dynamic> _$NavigaTumNavigationAdditionalPropertiesToJson(
   NavigaTumNavigationAdditionalProperties instance,
-) => <String, dynamic>{'computed': instance.properties};
+) => <String, dynamic>{
+  'computed': instance.properties,
+  'floors': instance.floors,
+};

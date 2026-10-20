@@ -10,10 +10,12 @@ class NavigaTumRoomBuildingView extends StatelessWidget {
   const NavigaTumRoomBuildingView({
     super.key,
     required this.coordinates,
+    required this.floor,
     this.isLandScape = false,
   });
 
   final NavigaTumNavigationCoordinates coordinates;
+  final int? floor;
   final bool isLandScape;
 
   @override
@@ -26,7 +28,9 @@ class NavigaTumRoomBuildingView extends StatelessWidget {
 
   MapWidget _map() {
     return MapWidget.fullPadding(
-      zoom: 17,
+      indoor: true,
+      initialFloor: floor,
+      zoom: floor == null ? 17 : 19,
       aspectRatioNeeded: isLandScape ? false : true,
       latLng: LatLng(coordinates.latitude!, coordinates.longitude!),
       markers: {

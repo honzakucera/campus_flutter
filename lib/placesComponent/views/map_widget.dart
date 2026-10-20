@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:campus_flutter/base/extensions/context.dart';
+import 'package:campus_flutter/navigaTumComponent/model/navigatum_map_style.dart';
+import 'package:campus_flutter/navigaTumComponent/services/navigatum_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:campus_flutter/placesComponent/model/maps/marker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -18,6 +21,9 @@ class MapWidget extends ConsumerStatefulWidget {
     bool aspectRatioNeeded = true,
     bool roundedCorners = true,
     Widget? mapLegend,
+    bool indoor = false,
+    bool showFloorSelector = false,
+    int? initialFloor = 0,
   }) {
     return MapWidget._(
       markers: markers,
@@ -27,6 +33,9 @@ class MapWidget extends ConsumerStatefulWidget {
       aspectRatioNeeded: aspectRatioNeeded,
       roundedCorners: roundedCorners,
       mapLegend: mapLegend,
+      indoor: indoor,
+      showFloorSelector: showFloorSelector,
+      initialFloor: initialFloor,
     );
   }
 
@@ -38,6 +47,9 @@ class MapWidget extends ConsumerStatefulWidget {
     bool aspectRatioNeeded = true,
     bool roundedCorners = true,
     Widget? mapLegend,
+    bool indoor = false,
+    bool showFloorSelector = false,
+    int? initialFloor = 0,
   }) {
     return MapWidget._(
       markers: markers,
@@ -48,6 +60,9 @@ class MapWidget extends ConsumerStatefulWidget {
       aspectRatioNeeded: aspectRatioNeeded,
       roundedCorners: roundedCorners,
       mapLegend: mapLegend,
+      indoor: indoor,
+      showFloorSelector: showFloorSelector,
+      initialFloor: initialFloor,
     );
   }
 
@@ -60,6 +75,9 @@ class MapWidget extends ConsumerStatefulWidget {
     bool aspectRatioNeeded = true,
     bool roundedCorners = true,
     Widget? mapLegend,
+    bool indoor = false,
+    bool showFloorSelector = false,
+    int? initialFloor = 0,
   }) {
     return MapWidget._(
       markers: markers,
@@ -70,6 +88,9 @@ class MapWidget extends ConsumerStatefulWidget {
       aspectRatioNeeded: aspectRatioNeeded,
       roundedCorners: roundedCorners,
       mapLegend: mapLegend,
+      indoor: indoor,
+      showFloorSelector: showFloorSelector,
+      initialFloor: initialFloor,
     );
   }
 
@@ -82,6 +103,9 @@ class MapWidget extends ConsumerStatefulWidget {
     required this.aspectRatioNeeded,
     required this.roundedCorners,
     this.mapLegend,
+    this.indoor = false,
+    this.showFloorSelector = false,
+    this.initialFloor = 0,
   });
 
   final Set<Marker> markers;
@@ -92,6 +116,9 @@ class MapWidget extends ConsumerStatefulWidget {
   final bool roundedCorners;
   final EdgeInsets? padding;
   final Widget? mapLegend;
+  final bool indoor;
+  final bool showFloorSelector;
+  final int? initialFloor;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _MapWidgetState();
@@ -100,13 +127,44 @@ class MapWidget extends ConsumerStatefulWidget {
 class _MapWidgetState extends ConsumerState<MapWidget> {
   MapLibreMapController? _mapController;
   bool isMapVisible = false;
+  NavigaTumMapStyle? _indoorStyle;
+  String? _styleString;
+  late int? _floor;
+  bool _styleLoadFailed = false;
 
   final Set<String> _loadedImages = {};
 
   @override
+  void initState() {
+    super.initState();
+    _floor = widget.initialFloor;
+    if (widget.indoor) _loadIndoorStyle();
+  }
+
+  Future<void> _loadIndoorStyle() async {
+    setState(() => _styleLoadFailed = false);
+    try {
+      final style = await NavigaTumService.mapStyle();
+      if (!mounted) return;
+      setState(() {
+        _indoorStyle = style;
+        _styleString = style.forFloor(_floor);
+      });
+    } catch (error, stackTrace) {
+      log('Unable to load indoor map', error: error, stackTrace: stackTrace);
+      if (mounted) setState(() => _styleLoadFailed = true);
+    }
+  }
+
+  @override
   void didUpdateWidget(covariant MapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_mapController != null && widget.markers != oldWidget.markers) {
+    if (widget.initialFloor != oldWidget.initialFloor) {
+      _selectFloor(widget.initialFloor, zoomIn: false);
+    }
+    if (_mapController != null &&
+        isMapVisible &&
+        widget.markers != oldWidget.markers) {
       _updateMarkers(_mapController!);
     }
   }
@@ -137,6 +195,17 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
   }
 
   Widget _buildMapStack() {
+    if (widget.indoor && _styleString == null) {
+      return Center(
+        child: _styleLoadFailed
+            ? TextButton.icon(
+                onPressed: _loadIndoorStyle,
+                icon: const Icon(Icons.refresh),
+                label: Text(context.tr('tryAgain')),
+              )
+            : const CircularProgressIndicator.adaptive(),
+      );
+    }
     return AnimatedOpacity(
       curve: Curves.fastOutSlowIn,
       opacity: isMapVisible ? 1.0 : 0.01,
@@ -145,7 +214,14 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
         children: [
           MapLibreMap(
             styleString:
+                _styleString ??
                 "https://nav.tum.de/martin/style/navigatum-basemap.json",
+            trackCameraPosition: true,
+            // Native synchronous updates used for dragging cause symbol artifacts
+            // in MapLibre 0.26.1. Campus/room markers normally stay fixed.
+            dragEnabled: widget.markers.any(
+              (marker) => marker.draggable == true,
+            ),
             initialCameraPosition: CameraPosition(
               target:
                   // mapLibre and Google Maps have different latLng classes. This converts between them and also provides a default location. - Nathan
@@ -173,6 +249,46 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
             onStyleLoadedCallback: () => _onStyleLoaded(),
             attributionButtonPosition: AttributionButtonPosition.bottomLeft,
           ),
+
+          if (widget.showFloorSelector && _indoorStyle != null)
+            Positioned(
+              top: context.padding,
+              left: context.padding,
+              child: Material(
+                elevation: 3,
+                borderRadius: BorderRadius.circular(12),
+                color: context.theme.cardColor,
+                child: PopupMenuButton<String>(
+                  tooltip: context.tr('selectFloor'),
+                  enabled: isMapVisible,
+                  initialValue: _floor?.toString() ?? 'outdoors',
+                  onSelected: (value) => _selectFloor(int.tryParse(value)),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'outdoors',
+                      child: Text(context.tr('outdoorMap')),
+                    ),
+                    for (final floor in _indoorStyle!.floors.reversed)
+                      PopupMenuItem(
+                        value: floor.toString(),
+                        child: Text(_floorLabel(floor)),
+                      ),
+                  ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.layers_outlined),
+                        const SizedBox(width: 6),
+                        Text(_floorLabel(_floor)),
+                        const Icon(Icons.arrow_drop_down),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
 
           if (widget.mapLegend != null)
             Align(
@@ -211,13 +327,38 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
     final controller = _mapController;
     if (controller == null) return;
 
+    // A floor change reloads the style, including its images and symbols.
+    _loadedImages.clear();
     await _loadMarkerImages(controller);
-    _updateMarkers(controller);
+    await _updateMarkers(controller);
 
     if (mounted) {
       setState(() {
         isMapVisible = true;
       });
+    }
+  }
+
+  String _floorLabel(int? floor) => floor == null
+      ? context.tr('outdoorMap')
+      : floor == 0
+      ? context.tr('groundFloor')
+      : context.tr('floorNumber', args: ['$floor']);
+
+  void _selectFloor(int? floor, {bool zoomIn = true}) {
+    if (_floor != floor) {
+      setState(() {
+        _floor = floor;
+        _styleString = _indoorStyle?.forFloor(floor);
+        isMapVisible = false;
+      });
+    }
+    final controller = _mapController;
+    if (zoomIn &&
+        floor != null &&
+        controller != null &&
+        (controller.cameraPosition?.zoom ?? 0) < 17) {
+      controller.animateCamera(CameraUpdate.zoomTo(17));
     }
   }
 
@@ -237,13 +378,20 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
     await load("pin_red", "assets/images/map/pin_red.webp");
   }
 
-  void _updateMarkers(MapLibreMapController controller) async {
+  Future<void> _updateMarkers(MapLibreMapController controller) async {
     await controller.clearSymbols();
 
     await controller.symbolManager?.setIconAllowOverlap(true);
     await controller.symbolManager?.setIconIgnorePlacement(true);
     await controller.symbolManager?.setTextAllowOverlap(true);
     await controller.symbolManager?.setTextIgnorePlacement(true);
+    // The annotation manager defaults to fonts not served by NavigaTUM.
+    for (final layer in controller.symbolManager?.layerIds ?? <String>[]) {
+      await controller.setLayerProperties(
+        layer,
+        const SymbolLayerProperties(textFont: ['Roboto Regular']),
+      );
+    }
 
     List<SymbolOptions> options = [];
     List<Map<String, dynamic>> data = [];
@@ -271,7 +419,8 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
         ),
       );
 
-      data.add({"id": marker.id, "onTap": marker.infoWindow?.onTap});
+      // Symbol data is sent to native MapLibre as JSON, so keep callbacks in Dart.
+      data.add({"id": marker.id});
     }
 
     for (int i = 0; i < options.length; i++) {
@@ -283,7 +432,11 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
     controller.onSymbolTapped.add((symbol) {
       // display text on tapped symbol & remove text from other symbols
       // if text is already displayed and item has onTap callback, callback is executed
-      final onTap = symbol.data?["onTap"];
+      final onTap = widget.markers
+          .where((marker) => marker.id == symbol.data?["id"])
+          .firstOrNull
+          ?.infoWindow
+          ?.onTap;
 
       if (symbol.options.textOpacity == 1 && onTap is void Function()) {
         onTap();

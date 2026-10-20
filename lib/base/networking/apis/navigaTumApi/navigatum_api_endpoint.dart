@@ -2,6 +2,8 @@ sealed class NavigaTumApiEndpoint {
   Map<String, String> getParameters() => {};
 }
 
+class NavigaTumApiEndpointMapStyle extends NavigaTumApiEndpoint {}
+
 class NavigaTumApiEndpointSearch extends NavigaTumApiEndpoint {
   final String query;
   final String? type;

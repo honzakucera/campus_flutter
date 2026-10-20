@@ -33,6 +33,8 @@ class CampusMapView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MapWidget.noPadding(
+      indoor: true,
+      showFloorSelector: true,
       aspectRatioNeeded: false,
       markers: ref.read(placesViewModel).getCampusMarkers(context, campus),
       latLng: LatLng(campus.location.latitude, campus.location.longitude),

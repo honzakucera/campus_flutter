@@ -21,6 +21,8 @@ class NavigaTumApi extends Api {
   @override
   String get slug {
     switch (navigaTumApiEndpoint) {
+      case NavigaTumApiEndpointMapStyle _:
+        return "martin/style/navigatum-basemap.json";
       case NavigaTumApiEndpointSearch _:
         return "api/search";
       case NavigaTumApiEndpointDetails details:

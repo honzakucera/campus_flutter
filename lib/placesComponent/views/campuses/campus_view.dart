@@ -84,6 +84,8 @@ class _CampusViewState extends ConsumerState<CampusView> {
             title: context.tr("map"),
             child: Expanded(
               child: MapWidget.fullPadding(
+                indoor: true,
+                showFloorSelector: true,
                 aspectRatioNeeded: false,
                 markers: ref
                     .read(placesViewModel)

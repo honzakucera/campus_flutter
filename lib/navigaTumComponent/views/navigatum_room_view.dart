@@ -122,6 +122,7 @@ class _NavigaTumRoomState extends ConsumerState<NavigaTumRoomView> {
               Expanded(
                 child: NavigaTumRoomBuildingView(
                   coordinates: details.coordinates,
+                  floor: details.additionalProperties.floors.firstOrNull?.id,
                   isLandScape: true,
                 ),
               ),
@@ -151,7 +152,10 @@ class _NavigaTumRoomState extends ConsumerState<NavigaTumRoomView> {
               properties: details.additionalProperties.properties,
             ),
             if (isPortrait)
-              NavigaTumRoomBuildingView(coordinates: details.coordinates),
+              NavigaTumRoomBuildingView(
+                coordinates: details.coordinates,
+                floor: details.additionalProperties.floors.firstOrNull?.id,
+              ),
             if ((details.maps.roomfinder?.available ?? []).isNotEmpty)
               NavigaTumRoomMapsView(maps: ref.read(viewModel).getMaps()),
           ],

@@ -76,7 +76,7 @@ class InformationView extends StatelessWidget {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.only(right: 10.0),
-              child: _tumLogo(context),
+              child: _tumLogo(),
             ),
           ),
         ),
@@ -88,15 +88,11 @@ class InformationView extends StatelessWidget {
     );
   }
 
-  Widget _tumLogo(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+  Widget _tumLogo() {
     return Padding(
       padding: const EdgeInsets.all(0.0),
       child: Image.asset(
-        isDark
-            ? 'assets/images/logos/tum-logo-white.png'
-            : 'assets/images/logos/tum-logo-blue.png',
+        'assets/images/logos/tum-logo.png',
         fit: BoxFit.contain,
         height: 25,
       ),

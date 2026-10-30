@@ -51,7 +51,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchImage" width="2048" height="1079"/>
+        <image name="LaunchImage" width="240" height="128"/>
         <namedColor name="tumBlue">
             <color red="0.0" green="0.6298499971628189" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

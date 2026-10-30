@@ -116,10 +116,7 @@ flutter:
   assets:
     - assets/translations/
     - assets/mapStyles/
-    - assets/images/logos/tum-logo-blue.png
-    - assets/images/logos/tum-logo-white.png
-    - assets/images/logos/tum-logo-blue-text.png
-    - assets/images/logos/tum-logo-rainbow.png
+    - assets/images/logos/tum-logo.png
     - assets/images/placeholders/portrait_placeholder.png
     - assets/images/placeholders/movie_placeholder.png
     - assets/images/placeholders/news_placeholder.png

@@ -45,9 +45,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       children: [
                         const Spacer(),
                         const Image(
-                          image: AssetImage(
-                            "assets/images/logos/tum-logo-blue.png",
-                          ),
+                          image: AssetImage("assets/images/logos/tum-logo.png"),
                           height: 60,
                         ),
                         const Padding(
@@ -91,7 +89,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 children: [
                   const Spacer(),
                   const Image(
-                    image: AssetImage("assets/images/logos/tum-logo-blue.png"),
+                    image: AssetImage("assets/images/logos/tum-logo.png"),
                     height: 60,
                   ),
                   const Padding(padding: EdgeInsets.symmetric(vertical: 10.0)),

@@ -38,7 +38,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Campus">
+        android:label="TUM Bambus Campus">
 
         <receiver
             android:name=".widgets.calendar.CalendarWidgetProvider"
@@ -70,6 +70,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:label="Bambus"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
             android:hardwareAccelerated="true"
